@@ -45,30 +45,16 @@ async function handleSchedule(env) {
 
 // 抓取新闻
 async function fetchNews() {
-    const response = await fetch('https://api.mktnews.net/api/flash/host');
+//    const response = await fetch('https://api.mktnews.net/api/flash/host');
+    const response = await fetch('https://static.mktnews.net/json/flash/en.json');
     const json = await response.json();
 
-    if (!json.data || !Array.isArray(json.data)) {
-        return null;
-    }
-
-    // 先在 data 数组中找到 id: 1000 的节点
-    const parentNode = json.data.find(item => item.id === 1000);
-    if (!parentNode || !parentNode.child) {
-        console.log('  ✗ 未找到 id:1000 的父节点或其 child 数组');
-        return null;
-    }
-
-    // 在 1000 节点的 child 数组中找到 id: 1001 的节点
-    const targetNode = parentNode.child.find(item => item.id === 1001);
-
-    if (!targetNode || !targetNode.flash_list) {
-        console.log('  ✗ 未找到 id:1001 的目标节点或其 flash_list 数组');
+    if (!Array.isArray(json)) {
         return null;
     }
 
     // 在 1001 节点的 flash_list 中直接搜索标题包含 "【Past 24 Hours" 的新闻
-    const targetNews = targetNode.flash_list.find(item =>
+    const targetNews = json.find(item =>
         item.data && item.data.content && item.data.content.includes('【Past 24 Hours')
     );
 
