@@ -45,7 +45,6 @@ async function handleSchedule(env) {
 
 // 抓取新闻
 async function fetchNews() {
-//    const response = await fetch('https://api.mktnews.net/api/flash/host');
     const response = await fetch('https://static.mktnews.net/json/flash/en.json');
     const json = await response.json();
 
@@ -93,36 +92,53 @@ async function translateContent(content) {
     return finalContent;
 }
 
-// 调用 Google Translate API（非官方）
+// 调用 Google Translate API（非官方）- 分段翻译
 async function translateText(text) {
     try {
-        const encodedText = encodeURIComponent(text);
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=en&tl=zh-CN&q=${encodedText}`;
+        // 按【BR】分段
+        const segments = text.split('【BR】');
+        const translatedSegments = [];
 
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        // 逐段翻译
+        for (const segment of segments) {
+            // 跳过空段落
+            if (!segment.trim()) {
+                translatedSegments.push('');
+                continue;
             }
-        });
 
-        const responseText = await response.text();
+            const encodedText = encodeURIComponent(segment);
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=en&tl=zh-CN&q=${encodedText}`;
 
-        // 解析响应 - Google 返回格式: [[["翻译文本","原文本",null,null,10]],null,"en",...]
-        const json = JSON.parse(responseText);
-
-        // 提取翻译结果：json[0] 是翻译数组，每个元素的第一项是翻译文本
-        if (json && json[0] && Array.isArray(json[0])) {
-            let translatedText = '';
-            for (const item of json[0]) {
-                if (Array.isArray(item) && item[0]) {
-                    translatedText += item[0];
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                 }
+            });
+
+            const responseText = await response.text();
+            const json = JSON.parse(responseText);
+
+            // 提取翻译结果：json[0] 是翻译数组，每个元素的第一项是翻译文本
+            if (json && json[0] && Array.isArray(json[0])) {
+                let translatedSegment = '';
+                for (const item of json[0]) {
+                    if (Array.isArray(item) && item[0]) {
+                        translatedSegment += item[0];
+                    }
+                }
+                translatedSegments.push(translatedSegment);
+            } else {
+                console.error('    ✗ 翻译 API 返回格式错误:', responseText.substring(0, 200));
+                return null;
             }
-            return translatedText;
+
+            // 添加小延迟避免请求过快
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
-        console.error('    ✗ 翻译 API 返回格式错误:', responseText.substring(0, 200));
-        return null;
+        // 用【BR】重新组合
+        return translatedSegments.join('【BR】');
     } catch (error) {
         console.error('    ✗ 翻译 API 请求异常:', error.message);
         return null;
