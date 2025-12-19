@@ -74,7 +74,8 @@ async function translateContent(content) {
     let processedContent = content
         .replace(/<b>/g, '【B】')
         .replace(/<\/b>/g, '【/B】')
-        .replace(/<br\s*\/?>/gi, '【BR】');
+        .replace(/<br\s*\/?>/gi, '【BR】')
+        .replace(/- /g, '【-】');
 
     // 一次性翻译整个内容
     const translatedContent = await translateText(processedContent);
@@ -87,7 +88,8 @@ async function translateContent(content) {
     const finalContent = translatedContent
         .replace(/【B】/g, '**')
         .replace(/【\/B】/g, '**')
-        .replace(/【BR】/g, '\n\n');
+        .replace(/【BR】/g, '\n\n')
+        .replace(/【-】/g, '- ');
 
     return finalContent;
 }
