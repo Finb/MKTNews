@@ -52,23 +52,23 @@ async function fetchNews() {
         return null;
     }
 
-    // 在 1001 节点的 flash_list 中直接搜索标题包含 "【Past 24 Hours" 的新闻
+    // 在 1001 节点的 flash_list 中直接搜索标题包含 "【Past xx Hours" 的新闻
     const targetNews = json.find(item =>
-        item.data && item.data.content && item.data.content.includes('【Past 24 Hours')
+        item.data && item.data.content && /【.*?Past \d+ Hours/.test(item.data.content)
     );
 
     if (targetNews && targetNews.data && targetNews.data.content) {
         return targetNews.data.content;
     }
 
-    console.log('  ✗ 未找到包含 "【Past 24 Hours" 的新闻');
+    console.log('  ✗ 未找到包含 "【Past xx Hours" 的新闻');
     return null;
 }
 
 // 翻译内容
 async function translateContent(content) {
-    // 去掉标题部分 "【Past 24 Hours: Key News - MKTNews 】"
-    content = content.replace(/【Past 24 Hours.*?】/i, '').trim();
+    // 去掉标题部分 "【Past xx Hours: Key News - MKTNews 】"
+    content = content.replace(/【.*?Past \d+ Hours.*?】/i, '').trim();
 
     // 将 <b> 和 </b> 替换为占位符，<br/> 替换为换行占位符
     let processedContent = content

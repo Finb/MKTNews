@@ -2,9 +2,9 @@ name = "mktnews"
 main = "src/index.js"
 compatibility_date = "2025-12-16"
 
-# 定时任务：每天早上 9:00 (中国时区 UTC+8)
+# 定时任务：每天早上 9:20 (中国时区 UTC+8)
 [triggers]
-crons = ["0 1 * * *"]
+crons = ["20 1 * * *"]
 
 [vars]
 BARK_DEVICE_KEY = ""  # 请填入你的 Bark Device Key
