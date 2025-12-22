@@ -136,7 +136,7 @@ async function translateText(text) {
             }
 
             // 添加小延迟避免请求过快
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
 
         // 用【BR】重新组合
