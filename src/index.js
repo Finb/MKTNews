@@ -54,7 +54,7 @@ async function fetchNews() {
 
     // 在 1001 节点的 flash_list 中直接搜索标题包含 "【Past xx Hours" 的新闻
     const targetNews = json.find(item =>
-        item.data && item.data.content && /【.*?Past \d+ Hours/.test(item.data.content)
+        item.data && item.data.content && /【.*?Past \d+ Hours/i.test(item.data.content)
     );
 
     if (targetNews && targetNews.data && targetNews.data.content) {
@@ -67,7 +67,7 @@ async function fetchNews() {
 
 // 翻译内容
 async function translateContent(content) {
-    // 去掉标题部分 "【Past xx Hours: Key News - MKTNews 】"
+    // 去掉标题部分 "【Past xx Hours: Key News - MKTNews 】"（忽略大小写）
     content = content.replace(/【.*?Past \d+ Hours.*?】/i, '').trim();
 
     // 将 <b> 和 </b> 替换为占位符，<br/> 替换为换行占位符
@@ -110,7 +110,7 @@ async function translateText(text) {
             }
 
             const encodedText = encodeURIComponent(segment);
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=en&tl=zh-CN&q=${encodedText}`;
+            const url = `https://translate.day.app/translate_a/single?client=gtx&dt=t&sl=en&tl=zh-CN&q=${encodedText}`;
 
             const response = await fetch(url, {
                 headers: {
