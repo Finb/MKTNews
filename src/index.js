@@ -72,8 +72,8 @@ async function translateContent(content) {
 
     // 将 <b> 和 </b> 替换为占位符，<br/> 替换为换行占位符
     let processedContent = content
-        .replace(/<b>/g, '【B】')
-        .replace(/<\/b>/g, '【/B】')
+        .replace(/<b>/g, '【BB】')
+        .replace(/<\/b>/g, '【/BB】')
         .replace(/<br\s*\/?>/gi, '【BR】')
         .replace(/- /g, '【-】');
 
@@ -86,8 +86,8 @@ async function translateContent(content) {
 
     // 还原为 markdown 格式
     const finalContent = translatedContent
-        .replace(/【B】/g, '**')
-        .replace(/【\/B】/g, '**')
+        .replace(/【BB】/g, '**')
+        .replace(/【\/BB】/g, '**')
         .replace(/【BR】/g, '\n\n')
         .replace(/【-】/g, '- ');
 
