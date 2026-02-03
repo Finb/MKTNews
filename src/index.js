@@ -34,12 +34,13 @@ async function handleSchedule(env) {
 
         // 3. 推送到 Bark
         console.log('[步骤3] 开始推送到 Bark...');
-        await pushToBark(env.BARK_DEVICE_KEY, translatedContent);
+        await pushToBark(env.BARK_DEVICE_KEY, translatedContent, 1);
         console.log('=== 任务执行完成 ===');
     } catch (error) {
-        // 静默处理错误
+        // 发送错误信息到 Bark（不保存）
         console.error('❌ 任务执行出错:', error.message);
         console.error(error);
+        await pushToBark(env.BARK_DEVICE_KEY, `执行出错:\n${error.message}`, 0);
     }
 }
 
@@ -148,7 +149,7 @@ async function translateText(text) {
 }
 
 // 推送到 Bark
-async function pushToBark(deviceKey, content) {
+async function pushToBark(deviceKey, content, isArchive = 1) {
     if (!deviceKey) {
         console.error('  ✗ BARK_DEVICE_KEY 未设置');
         return;
@@ -163,7 +164,8 @@ async function pushToBark(deviceKey, content) {
             body: JSON.stringify({
                 group: 'MKTNews',
                 markdown: content,
-                device_key: deviceKey
+                device_key: deviceKey,
+                isArchive: isArchive.toString()
             })
         });
 
